@@ -26,7 +26,7 @@ Do you collect the data?
 >No! It is sourced from [this](https://www.covid19india.org/faq) upstream repository maintained by an amazing group of dedicated volunteers who are curating and verifying the data coming from various state bulletins and official handles. 
 
 Then, what are you doing?
->Simple! Just making the background data more accessible to public, data enthusiasts, analysts, researchers etc.
+>Simple! Just making the background data more accessible to public, data enthusiasts, analysts and researchers etc.
 
 Is it realtime?
 >No. Currently, I will update the data twice every day until I completly automate it.
