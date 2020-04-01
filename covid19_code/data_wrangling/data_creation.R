@@ -29,7 +29,7 @@ colnames(ncov19india)<-columns
 #####Creation of raw dataset - Individual####
 
 ncov19india_raw<-ncov19india[ncov19india$dateannounced != "",c(13,17,8,7,6,5,3,19,1,10,4,18)]
-file1 <- 'ncov19india_raw'
+file1 <- 'ncov19individual_raw'
 write.xlsx(ncov19india_raw, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
 write.csv(ncov19india_raw, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
 
