@@ -5,7 +5,7 @@ This, 2019 Novel Coronavirusis data repository, is initiated to provide everyone
 
 # Folder structure
 Data/Format/
->Excel: excel files for thse who would like to work on spreadsheet\
+>Excel: excel files for those who would like to work on the spreadsheet\
 CSV: CSV files for those who would be more comfortable with textual file
 
 Format/Level of observation/
