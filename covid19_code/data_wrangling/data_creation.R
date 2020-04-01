@@ -9,7 +9,7 @@ library(tidyr)
 #####Read data from json file####
 download.file('http://github.com/covid19india/api/raw/master/raw_data.json', destfile = "raw_data.json")
 data = rjson::fromJSON(file="raw_data.json")
-# do the extraction, assembly and naming
+# Extraction, assembly and naming
 data_n<-data[['raw_data']]
 grabInfo<-function(var){
   print(paste("Variable", var, sep=" "))  
