@@ -10,9 +10,9 @@ CSV: CSV files for those who would be more comfortable with textual file
 
 Format/Level of observation/
 
->Indivual level: The data is of individual level and in long format\
+>Indivual level: The data is of individual level and in long format (both raw and clean)\
 State level: The data is of state level and can be found in both long and wide format\
-National level: The is data is anational level time serise data
+National level: The is data is anational level time series data
 
 covid19_code/
 >Data wrangling: Codes to reproduce the files\
