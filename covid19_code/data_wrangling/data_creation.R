@@ -56,7 +56,7 @@ tab1(ncov19india_clean$currentstatus) # 81 missing values - will be recorded as 
 ncov19india_clean$currentstatus<-ifelse(ncov19india_clean$currentstatus == "", "Undefined", as.character(ncov19india_clean$currentstatus))
 tab1(ncov19india_clean$currentstatus)
 tab1(ncov19india_clean$statuschangedate) # 84 missing values - will not be removed
-file1 <- 'ncov19india_clean'
+file1 <- 'ncov19individual_clean'
 write.xlsx(ncov19india_clean, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
 write.csv(ncov19india_clean, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
 
