@@ -46,7 +46,7 @@ ncov19india_clean$detectedcity<-NULL
 tab1(ncov19india_clean$dateannounced) # No missing values
 tab1(ncov19india_clean$contractedfromwhichpatientsuspected) # missing values > 50% - will be removed
 ncov19india_clean$contractedfromwhichpatientsuspected<-NULL
-tab1(ncov19india_clean$typeoftransmission) #26 missing values - will be recorded as "Undefined"; "TBD" will be corded as "ToBeDecided".
+tab1(ncov19india_clean$typeoftransmission) #26 missing values - will be recorded as "Undefined"; "TBD" will be coded as "ToBeDecided".
 ncov19india_clean$typeoftransmission<-ifelse(ncov19india_clean$typeoftransmission == "", "Undefined", ifelse(ncov19india_clean$typeoftransmission == "TBD", "ToBeDecided", as.character(ncov19india_clean$typeoftransmission)))
 tab1(ncov19india_clean$typeoftransmission)
 tab1(ncov19india_clean$agebracket) # missing values > 50% - will be removed
