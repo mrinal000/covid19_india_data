@@ -90,3 +90,4 @@ colnames(ncov19india_timeserise)<-c("dateannounced", "numberofcases")
 file1 <- 'ncov19india_timeserise'
 write.xlsx(ncov19india_timeserise, file = paste0("./covid19_data/excel/national_timeseries/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
 write.csv(ncov19india_timeserise, file = paste0("./covid19_data/csv/national_timeseries/",sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
+unlink(raw_data.json)
