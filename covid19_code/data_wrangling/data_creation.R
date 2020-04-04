@@ -1,4 +1,4 @@
-#####Load libraries####
+#####Load libraries to environment####
 library(rjson)
 library(gdata)
 library(openxlsx)
