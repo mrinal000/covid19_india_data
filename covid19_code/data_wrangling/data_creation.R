@@ -1,3 +1,9 @@
+#####Remove old files####
+mydir <- "./covid19_data/"
+delcsv <- dir(path=mydir ,pattern="*.csv", recursive = T)
+delxlsx <- dir(path=mydir ,pattern="*.xlsx", recursive = T)
+unlink(file.path(mydir, delcsv))
+unlink(file.path(mydir, delxlsx))
 #####Load libraries to environment####
 library(rjson)
 library(gdata)
@@ -22,18 +28,18 @@ returnData<-function(x, var){
     return(NA)
   }
 }
-ncov19india<-data.frame(sapply(1:19, grabInfo), stringsAsFactors=FALSE)
+ncov19india<-data.frame(sapply(1:20, grabInfo), stringsAsFactors=FALSE)
 columns<-names(data_n[[1]])
 colnames(ncov19india)<-columns
 
-#####Creation of raw dataset - Individual####
+#####Creation of raw data set - Individual####
 
-ncov19india_raw<-ncov19india[ncov19india$dateannounced != "",c(13,17,8,7,6,5,3,19,1,10,4,18)]
+ncov19india_raw<-ncov19india[ncov19india$dateannounced != "",c(14,18,11,8,7,6,5,3,20,1,10,4,19)]
 file1 <- 'ncov19individual_raw'
-write.xlsx(ncov19india_raw, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
-write.csv(ncov19india_raw, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
+write.xlsx(ncov19india_raw, file = paste0("./covid19_data/excel/individual/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
+write.csv(ncov19india_raw, file = paste0(sub("./covid19_data/csv/individual/", '\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
 
-#####Creation of clean dataset#### Variables having more than 50% missing value will be removed####
+#####Creation of clean data set#### Variables having more than 50% missing value will be removed####
 
 #individual#
 ncov19india_clean<-ncov19india_raw
@@ -56,29 +62,31 @@ tab1(ncov19india_clean$currentstatus) # 81 missing values - will be recorded as 
 ncov19india_clean$currentstatus<-ifelse(ncov19india_clean$currentstatus == "", "Undefined", as.character(ncov19india_clean$currentstatus))
 tab1(ncov19india_clean$currentstatus)
 tab1(ncov19india_clean$statuschangedate) # 84 missing values - will not be removed
+tab1(ncov19india_clean$nationality) # missing values > 50% - will be removed
+ncov19india_clean$nationality<-NULL
 file1 <- 'ncov19individual_clean'
-write.xlsx(ncov19india_clean, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
-write.csv(ncov19india_clean, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
+write.xlsx(ncov19india_clean, file = paste0("./covid19_data/excel/individual/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
+write.csv(ncov19india_clean, file = paste0("./covid19_data/csv/individual/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
 
-#####Creation of dataset - State####
+#####Creation of data set - State####
 
 ##Long##
 ncov19india_state<- ncov19india_clean %>% group_by(detectedstate, dateannounced) %>% tally()
 colnames(ncov19india_state)<-c("detectedstate", "dateannounced", "numberofcases")
 file1 <- 'ncov19state_long'
-write.xlsx(ncov19india_state, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
-write.csv(ncov19india_state, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
+write.xlsx(ncov19india_state, file = paste0("./covid19_data/excel/state/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
+write.csv(ncov19india_state, file = paste0("./covid19_data/csv/state/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
 
 ##Wide##
 ncov19state_wide<-spread(ncov19india_state, dateannounced, numberofcases)
 names(ncov19state_wide)
 file1 <- 'ncov19state_wide'
-write.xlsx(ncov19state_wide, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
-write.csv(ncov19state_wide, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
+write.xlsx(ncov19state_wide, file = paste0("./covid19_data/excel/state/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
+write.csv(ncov19state_wide, file = paste0("./covid19_data/csv/state/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
 
-#####Creation of national datatset####
+#####Creation of national datat set####
 ncov19india_timeserise<- ncov19india_clean %>% group_by(dateannounced) %>% tally()
 colnames(ncov19india_timeserise)<-c("dateannounced", "numberofcases")
 file1 <- 'ncov19india_timeserise'
-write.xlsx(ncov19india_timeserise, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
-write.csv(ncov19india_timeserise, file = paste0(sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
+write.xlsx(ncov19india_timeserise, file = paste0("./covid19_data/excel/national_timeseries/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
+write.csv(ncov19india_timeserise, file = paste0("./covid19_data/csv/national_timeseries/",sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
