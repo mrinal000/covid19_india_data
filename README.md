@@ -29,7 +29,7 @@ Then, what are you doing?
 >Simple! Just making the background data more accessible to public, data enthusiasts, analysts and researchers etc.
 
 Is it realtime?
->No. Currently, I will update the data twice every day until I completly automate it.
+>No. Currently, I am updating the data atleast thrice every day until I completly automate it.
 
 # Resources
 >https://www.mohfw.gov.in
