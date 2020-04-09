@@ -42,8 +42,6 @@ write.csv(ncov19india_raw, file = paste0("./covid19_data/csv/individual/", sub('
 
 #individual#
 ncov19india_clean<-ncov19india_raw
-tab1(ncov19india_clean$statepatientnumber) # missing values > 50% - will be removed
-ncov19india_clean$statepatientnumber<-NULL
 tab1(ncov19india_clean$detectedstate) # No missing values
 tab1(ncov19india_clean$detecteddistrict) # missing values <  50% - will not be removed
 tab1(ncov19india_clean$detectedcity) # missing values > 50% - will be removed
@@ -51,13 +49,13 @@ ncov19india_clean$detectedcity<-NULL
 tab1(ncov19india_clean$dateannounced) # No missing values
 tab1(ncov19india_clean$contractedfromwhichpatientsuspected) # missing values > 50% - will be removed
 ncov19india_clean$contractedfromwhichpatientsuspected<-NULL
-tab1(ncov19india_clean$typeoftransmission) #26 missing values - will be recorded as "Undefined"; "TBD" will be coded as "ToBeDecided".
+tab1(ncov19india_clean$typeoftransmission) # will be recorded as "Undefined"; "TBD" will be coded as "ToBeDecided".
 ncov19india_clean$typeoftransmission<-ifelse(ncov19india_clean$typeoftransmission == "", "Undefined", ifelse(ncov19india_clean$typeoftransmission == "TBD", "ToBeDecided", as.character(ncov19india_clean$typeoftransmission)))
 tab1(ncov19india_clean$typeoftransmission)
 tab1(ncov19india_clean$agebracket) # missing values > 50% - will be removed
 ncov19india_clean$agebracket<-NULL
 tab1(ncov19india_clean$gender) # missing values > 50% - will be removed
-tab1(ncov19india_clean$currentstatus) # 81 missing values - will be recorded as "Undefined"
+tab1(ncov19india_clean$currentstatus) # 1 missing values - will be recorded as "Undefined"
 ncov19india_clean$currentstatus<-ifelse(ncov19india_clean$currentstatus == "", "Undefined", as.character(ncov19india_clean$currentstatus))
 tab1(ncov19india_clean$currentstatus)
 tab1(ncov19india_clean$statuschangedate) # 84 missing values - will not be removed
