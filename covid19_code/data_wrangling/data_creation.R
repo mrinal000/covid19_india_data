@@ -29,12 +29,11 @@ returnData<-function(x, var){
   }
 }
 ncov19india<-data.frame(sapply(1:20, grabInfo), stringsAsFactors=FALSE)
-columns<-names(data_n[[1]])
-colnames(ncov19india)<-columns
+colnames(ncov19india)<-names(data_n[[1]])
 
 #####Creation of raw data set - Individual####
 
-ncov19india_raw<-ncov19india[ncov19india$dateannounced != "",c(14,18,11,8,7,6,5,3,20,1,10,4,19)]
+ncov19india_raw<-ncov19india[ncov19india$dateannounced != "",c(13,17,11,8,7,6,5,3,20,1,10,4,19)]
 file1 <- 'ncov19individual_raw'
 write.xlsx(ncov19india_raw, file = paste0("./covid19_data/excel/individual/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
 write.csv(ncov19india_raw, file = paste0("./covid19_data/csv/individual/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.csv'), na = "")
