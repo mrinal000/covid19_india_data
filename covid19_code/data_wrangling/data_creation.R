@@ -5,7 +5,7 @@ delxlsx <- dir(path=mydir ,pattern="*.xlsx", recursive = T)
 unlink(file.path(mydir, delcsv))
 unlink(file.path(mydir, delxlsx))
 #####Load libraries to environment####
-library(rjson)
+library(jsonlite)
 library(gdata)
 library(openxlsx)
 library(epiDisplay)
@@ -13,11 +13,10 @@ library(dplyr)
 library(tidyr)
 
 #####Read data from json file####
-ncov19india = fromJSON('http://github.com/covid19india/api/raw/master/raw_data.json') %>% as.data.frame
+ncov19india = fromJSON("http://github.com/covid19india/api/raw/master/raw_data.json") %>% as.data.frame
 names(ncov19india) <-gsub("raw_data.", "", names(ncov19india))
 
 #####Creation of raw data set - Individual####
-
 ncov19india_raw<-ncov19india[ncov19india$dateannounced != "",c(13,17,11,8,7,6,5,3,20,1,10,4,19)]
 file1 <- 'ncov19individual_raw'
 write.xlsx(ncov19india_raw, file = paste0("./covid19_data/excel/individual/", sub('\\..*', '', file1), format(Sys.time(),'_%d%m%y_%H%M%S'), '.xlsx'))
