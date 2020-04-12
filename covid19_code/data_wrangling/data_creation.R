@@ -13,23 +13,8 @@ library(dplyr)
 library(tidyr)
 
 #####Read data from json file####
-download.file('http://github.com/covid19india/api/raw/master/raw_data.json', destfile = "raw_data.json")
-data = rjson::fromJSON(file="raw_data.json")
-# Extraction, assembly and naming
-data_n<-data[['raw_data']]
-grabInfo<-function(var){
-  print(paste("Variable", var, sep=" "))  
-  sapply(data_n, function(x) returnData(x, var)) 
-}
-returnData<-function(x, var){
-  if(!is.null( x[[var]])){
-    return( trim(x[[var]]))
-  }else{
-    return(NA)
-  }
-}
-ncov19india<-data.frame(sapply(1:20, grabInfo), stringsAsFactors=FALSE)
-colnames(ncov19india)<-names(data_n[[1]])
+ncov19india = fromJSON('http://github.com/covid19india/api/raw/master/raw_data.json') %>% as.data.frame
+names(ncov19india) <-gsub("raw_data.", "", names(ncov19india))
 
 #####Creation of raw data set - Individual####
 
