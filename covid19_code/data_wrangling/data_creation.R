@@ -45,7 +45,7 @@ tab1(ncov19india_clean$statuschangedate) # 84 missing values - will not be remov
 tab1(ncov19india_clean$nationality) # missing values > 50% - will be removed
 ncov19india_clean$nationality<-NULL
 write.xlsx(ncov19india_clean, file = "./covid19_data/excel/individual/ncov19individual_clean.xlsx")
-write.csv(ncov19india_clean, file = "./covid19_data/excel/individual/ncov19individual_clean.csv", na = "")
+write.csv(ncov19india_clean, file = "./covid19_data/csv/individual/ncov19individual_clean.csv", na = "")
 
 #####Creation of data set - State####
 
