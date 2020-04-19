@@ -1,7 +1,7 @@
 # 2019 Novel Corona virus COVID-19 (2019-nCoV) National Data Repository for India
 
 
-This, 2019 Novel Coronavirusis data repository, is initiated to provide everyone with access to structured individual, state and national level data of corona virus pandemic. This data repository is created with a vision to provide tidy datasets to everybody who wants access to the corona virus data to understand, analyse and innovate solutions. I hope it will fulfill its' purpose. 
+This, 2019 Novel Corona virus data repository, is initiated to provide everyone with access to structured individual, state and national level data of corona virus pandemic. This data repository is created with a vision to provide tidy datasets to everybody who wants access to the corona virus data to understand, analyse and innovate solutions. I hope it will fulfill its' purpose. 
 
 # Folder structure
 Data/Format/
