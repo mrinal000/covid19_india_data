@@ -10,7 +10,7 @@ CSV: CSV files for those who would be more comfortable with textual file
 
 Format/Level of observation/
 
->Indivual level: The data is of individual level and in long format (both raw and clean)\
+>Individual level: The data is of individual level and in long format (both raw and clean)\
 State level: The data is of state level and can be found in both long and wide format\
 National level: The is the national level time series data
 
