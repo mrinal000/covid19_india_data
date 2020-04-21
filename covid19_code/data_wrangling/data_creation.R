@@ -13,8 +13,8 @@ library(dplyr)
 library(tidyr)
 
 #####Read data from json file####
-ncov19india = fromJSON("http://github.com/covid19india/api/raw/master/raw_data.json") %>% as.data.frame
-names(ncov19india) <-gsub("raw_data.", "", names(ncov19india))
+ncov19india = fromJSON("https://api.covid19india.org/raw_data.json") %>% as.data.frame
+names(ncov19india) <- gsub("raw_data.", "", names(ncov19india))
 
 #####Creation of raw data set - Individual####
 ncov19india_raw<-ncov19india[ncov19india$dateannounced != "",c(13,17,11,8,7,6,5,3,20,1,10,4,19)]
