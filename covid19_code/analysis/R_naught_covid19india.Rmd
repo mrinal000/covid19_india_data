@@ -215,7 +215,7 @@ ggplot(rt_tab, aes(x=date, y=Mean)) +
 
 #####Anything below this will go to the top of the blog post as a summary####
 
-> This is a reproducible document created with R Markdown. You can find the .Rmd file at https://github.com/mrinal000/covid19_india_data/tree/master/covid19_code/analysis. You can also reproduce the result using R Studio cloud at https://rstudio.cloud/project/1171531.
+> This is a reproducible document created with R Markdown. You can find the .Rmd file at https://github.com/mrinal000/covid19_india_data/tree/master/covid19_code/analysis. You can also reproduce the result using R Studio cloud at https://rstudio.cloud/project/1186054.
 
 *R* or the basic reproduction number estimates the number of susceptible person who can be infected by an already infected person. It is a function of numerous biological, sociobehavioral, and environmental factors. *R* remains a valuable epidemiological concept that helps in decision making during an outbreak. 
 
