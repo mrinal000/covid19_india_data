@@ -242,7 +242,7 @@ p1 <- ggplot(rt_tab, aes(x=date, y=Mean)) +
   view_follow(fixed_y = TRUE)+
   coord_cartesian(clip = 'off') +
   labs( y = 'Weekly-varying reproduction number', x = "Mid-week date") +
-  ggtitle('NCov19 weekly-varying reproduction number in India (2nd March - 19th April)', subtitle = "Date : {frame_along}")+
+  ggtitle('NCov19 weekly-varying reproduction number in India (2nd March - 20th April)', subtitle = "Date : {frame_along}")+
   enter_drift(x_mod = -1) + 
   exit_drift(x_mod = 1) +
   theme_bw() +
