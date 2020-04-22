@@ -1,0 +1,325 @@
+---
+title: "Covid19India"
+author: "Mrinal"
+date: "4/20/2020"
+output:
+  html_document: default
+  word_document: default
+---
+## Analysis methodology\
+Before we dig into the actual analysis, I would like to brief you, very shortly, about the core methodology that I have followed to derive the estimate of our interest i.e. time-varying *R-Naught* for Corona virus infection in India.\
+
+
+There are various methods to estimate R from surveillance data[[1]](https://www.ncbi.nlm.nih.gov/pubmed/15071187)[[2]](http://www.ncbi.nlm.nih.gov/pubmed/16642006) but these mechanistic transmission models require context specific assumptions, which, in case of novel epidemics are a bit tricky to obtain. Therefore, instead, I used a probabilistic method developed by [Wallinga and Teunis](https://www.ncbi.nlm.nih.gov/pubmed/15353409), refined and ported to R by [Anne Cori et. al.](https://academic.oup.com/aje/article/178/9/1505/89262) and further enhanced  by [R. N. Thompson](https://www.sciencedirect.com/science/article/pii/S1755436519300350#bib0090). This method, unlike others, is generic and requires only case incidence data and the distribution of the serial interval - the time between the onset of symptoms in a primary case and the onset of symptoms of secondary cases - to estimate dynamic R over the course of an epidemic. Further, it is more suitable because the contact rates and transmission ability can change over time, particularly when control measures are initiated. Furthermore, the time dependent reproduction number over a moderate time window (7days in our case) will be very stable because 2 successive time windows overlaps each other (6 days) - remember running average in time-series analysis. Additionally, it also accounts for the imported/foreign cases to make the estimates more accurate. Okay, I won't stretch it further, let's move into action.\
+
+## Data source\
+To estimate the reproduction number, we will be using the crowd-sourced data, which I maintain at [GitHub](https://github.com/mrinal000/covid19_india_data) and is periodically extracted from the [covid19india.org](covid19india.org) - a selfless-dedicated group, which collects and collates the data from various authenticated sources. 
+```{r setup, include = FALSE, echo = FALSE, warning = FALSE}
+## Loadig the libraries##
+library(ggplot2)
+library(gganimate)
+library(plotly)
+library(tidyverse)
+library(EpiEstim)
+library(epiDisplay)
+library(incidence)
+library(magick)
+library(gt)
+```
+```{r}
+## Read the data
+c19<-read.csv(url("https://raw.githubusercontent.com/mrinal000/covid19_india_data/master/covid19_data/csv/individual/ncov19individual_clean.csv"))
+```
+Now, we have the data in our environment. The next step is to prepare it for the analysis.
+```{r}
+## Check the first five rows of the data set
+head(c19)
+```
+## Data preparation\
+As we will compute the weekly R~t~ for India and will account for the imported cases, we will extract the "patientnumber", "dateannounced" and "typeoftransmission".
+```{r}
+## Extract the mentioned variables
+c19i<-c19[ , c("patientnumber", "dateannounced", "typeoftransmission")]
+## View the structure of the data set 
+str(c19i)
+```
+As you can see, the R-software recognized the date-variable as a factor variable. Let's tell R-software that it is a data type variable and then sort the data by date.
+```{r}
+## Announce that the "dateannounced" is a date variable and sort the data by the date
+c19is <- c19i %>%
+        mutate(dateannounced = as.Date(dateannounced, "%d/%m/%Y")) %>%
+        arrange(dateannounced)
+head(c19is)
+```
+Now that the data is sorted, let's explore the dates and the type of infections. We can see from the first few rows that there are a few cases at the end of January and start of February, then there is big gap till 2nd March. These observations will affect our time-varying estimate. Therefore, we will limit our data from 2nd March to 20th April.  
+```{r}
+## Specify the date boundaries
+filter <- c19is$dateannounced >= "2020-03-02" & c19is$dateannounced <= "2020-04-20"
+## Subset the data using the boundary
+c19is <- c19is[filter, ]
+rbind(head(c19is, 5), tail(c19is, 5))
+tab1(c19is$typeoftransmission, graph = F)
+```
+As you can see, there are a lot of undefined type of cases in our data. We will consider all the undecided cases as local to be on the safer side. This will also finish our data preparation task. 
+```{r}
+## Recoding the labels
+c19is$typeoftransmission<-ifelse(as.character(c19is$typeoftransmission)=="ToBeDecided"|as.character(c19is$typeoftransmission)=="Undefined"|as.character(c19is$typeoftransmission)=="Unknown"|as.character(c19is$typeoftransmission)=="Local","local","imported")
+tab1(c19is$typeoftransmission, graph = F)
+```
+## Data visualization
+Let's plot the reported incidents of Covid19 infections over time. To get an overall feel of the phenomena. 
+```{r,}
+p <- ggplot(c19is  %>%
+  group_by(typeoftransmission) %>%
+  count(dateannounced),
+  aes(x=dateannounced, y=n, group=typeoftransmission)) +
+  geom_line(aes(color = typeoftransmission)) +
+  labs(color = "Type of transmission")+
+  geom_segment(aes(xend=max(dateannounced), yend = n), linetype=2, colour='blue')+
+  geom_point(size = 3) +
+  geom_text(aes(x = max(dateannounced)+.1, label = sprintf("%5.0f", n)), hjust=0)+
+  transition_reveal(dateannounced) +
+  view_follow(fixed_y = TRUE)+
+  coord_cartesian(clip = 'off') +
+  labs( y = 'Number of reported cases', x = "Timeline") +
+  ggtitle('NCov19 incidents in India (2nd March - 20th April)', subtitle = "Date : {frame_along}")+
+  enter_drift(x_mod = -1) +
+  exit_drift(x_mod = 1) +
+  theme_bw() +
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"),
+        plot.margin = margin(5.5, 40, 5.5, 5.5))+
+  theme(legend.position = "bottom")+
+  annotate("text", x = as.Date("2020-03-03", "%Y-%m-%d"), y =100 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-03", "%Y-%m-%d"), y = 250, label = "India\n suspended\n all visas", size = 2.5)+
+  annotate("text", x = as.Date("2020-03-12", "%Y-%m-%d"), y =180 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-12", "%Y-%m-%d"), y = 300, label = "1st Death\n in India", size = 2.5)+
+  annotate("text", x = as.Date("2020-03-16", "%Y-%m-%d"), y =300 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-16", "%Y-%m-%d"), y = 400, label = "1st imported case\n in Odisha", size = 2.5)+
+  annotate("text", x = as.Date("2020-03-25", "%Y-%m-%d"), y =450 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-25", "%Y-%m-%d"), y = 620, label = "Nation-wide\n lock down initiated\n by the PM", size = 2.5)+
+  annotate("text", x = as.Date("2020-03-29", "%Y-%m-%d"), y =800 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-29", "%Y-%m-%d"), y = 950, label = "Nizamuddin \nMarkaz\n evacuation", size = 2)+
+  annotate("text", x = as.Date("2020-03-27", "%Y-%m-%d"), y =180, label = sprintf('\u2BB5'), size = 10)+annotate("text", x = as.Date("2020-03-27", "%Y-%m-%d"), y = 300, label = "Transition into\n 2nd stage", size = 2.5)
+
+
+## Animate the ggobject
+animate(p, fps=5)
+```
+\
+Are you able to appreciate the impact of the 2nd phase transmission dynamics? Few more notable features are exponential growth (very evident), moderate incubation period and the most important thing is the frequent dips in the incidents, which is flashing our limited success in fight against Corona. However, there is nothing to be very happy about, yet. 
+
+## Modelling
+As I have mentioned earlier, this estimation method uses the incidents and the discrete distribution configuration of SI and standard deviation of SI to derive the reproduction estimate. We will use the estimations derived by a team in Japan using only certain observation. They estimated the the mean and SD to be 4.8 days (95% CI: 3.8, 6.1) and 2.3 days (95% CI: 1.6, 3.5), respectively,  for Covid19[[3]](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7128842/pdf/main.pdf). Let's now prepare our final input parameters that will go into the model. 
+
+```{r}
+## Mean serial interval for Covid19
+mean_cov_si <- 4.8
+## SD serial interval for Covid19
+sd_cov_si <- 2.3
+
+```
+```{r}
+## Plotting the distribution
+dicrete_si_distr <- discr_si(seq(0, 20), mean_cov_si, sd_cov_si)
+plot(seq(0, 20), dicrete_si_distr, type = "h",
+          lwd = 10, lend = 1, xlab = "Time (days)", ylab = "Frequency")
+title(main = "Discrete distribution of the serial interval of Covid19")
+```
+\
+Now, let's prepare the final structure of data that will go into the model. You can view the matrix using the function `*View(c19is_f)*`
+
+```{r}
+## We have
+head(c19is)
+## Spread the type of transmission and group by date-wise (Final)
+c19is_f<-incidence(c19is$dateannounced, groups = c19is$typeoftransmission)
+str(c19is_f)
+```
+Now, we will run the final model and extract all the information of interest.
+```{r, message=FALSE}
+## Estimate time-varying reproduction number  
+rt <- estimate_R(c19is_f, method = "parametric_si",
+                   config = make_config(list(
+                   mean_si = mean_cov_si, std_si = sd_cov_si)))
+## Extract the time varying R0 and error estimates.
+rt_tab<-rt$R
+## Renaming the column for easy handling
+colnames(rt_tab)<-gsub( "[(]R[)]", "", names(rt_tab))
+str(rt_tab)
+rbind(head(rt_tab[ ,c(1,3,4)], 5), tail(rt_tab[ , c(1,3,4)], 5))
+```
+As you can see, we have all our estimates stored nicely in the `r_tab` data frame.\
+
+t_start stand for the start day and t_end start for the end day. For the first R~t~ estimate fifth day was the middle day. If you remember, in our data, the first day was 2nd March, hence, the fifth day was 6th March and so on so forth. For all practical purpose our exercise is done! However, it is a good practice to bring all the relevant information together, so that we can use them further. I will now insert the mid-day dates for result tabulation and visualization.
+```{r}
+## Create and insert the date vector
+date<-seq(from = as.Date("2020-03-06"), to = as.Date("2020-04-17"), by = 'day')
+rt_tab$date<-date
+rt_final<-rt_tab[ , c(12, 1, 3, 4)]
+## Create the incidence data frame 
+inci_tab<-c19is %>% 
+  count(dateannounced, typeoftransmission) %>% 
+  spread(typeoftransmission, n, fill = 0)
+## Merging both the data sets
+result_tab<-left_join(inci_tab, rt_final, by = c("dateannounced" = "date"))
+```
+Finally, let's represent the results using a table and visualize using a plot and conclude.
+```{r}
+## The table
+result_tab[ ,c(1,2,3,5,6)] %>%
+  arrange(desc(dateannounced)) %>%
+  slice(1:10) %>%
+  gt() %>%
+  tab_header(
+    title = "Covid19 incidence and dynamic reproduction number in India") %>%
+  fmt_date(
+    columns = vars(dateannounced),
+    date_style = 3
+  ) %>%
+  fmt_number(
+    columns = vars(Std),
+    suffixing = TRUE
+  ) %>%
+  cols_label(
+    dateannounced = html("Date"),
+    imported = html("Imported cases"),
+    local = html("Local incidents"),
+    Mean = html("Weekly-varying R~t~"),
+    Std =html("Standard deviation")
+  ) %>%
+  tab_spanner(
+    label = "Reported incidents",
+    columns = vars(local, imported)
+  ) %>%
+  tab_spanner(
+    label = "Reproduction number",
+    columns = vars(Mean, Std)
+  ) %>%
+  tab_footnote(
+    footnote = md("The Reproduction number is measured for every seven days, therefore, generates no values for first 3."),
+    locations = cells_body(
+      columns = vars(dateannounced),
+      rows = 1:3))
+```
+\
+The estimated weekly-varying R~t~ is currently at `r rt_tab[nrow(rt_tab),3]` (SD: `r rt_tab[nrow(rt_tab),4]`) and is showing a downward trend due to the strict containment measure. The highest reproduction rate was seen on `r rt_tab[rt_tab$Mean == max(rt_tab$Mean),12]`: `r max(rt_tab$Mean)` (`r rt_tab[rt_tab$Mean == max(rt_tab$Mean),4]`).  
+
+```{r}
+ggplot(rt_tab, aes(x=date, y=Mean)) +
+    geom_ribbon(aes(ymin=Mean - Std, ymax=Mean + Std), fill = "grey70")+
+  geom_line(aes(y=Mean))+
+  theme_minimal()+
+  theme(panel.grid.minor.x=element_blank(),
+           panel.grid.major.x=element_blank())+
+  labs( y = 'Weekly-varying reproduction number', x = "Mid-week date")+
+   ggtitle('NCov19 weekly-varying Reproduction number in India (2nd March - 20th April)')
+```
+
+#####Anything below this will go to the top of the blog post as a summary####
+
+> This is a reproducible document created with R Markdown. You can find the .Rmd file at https://github.com/mrinal000/covid19_india_data/tree/master/covid19_code/analysis. You can also reproduce the result using R Studio cloud at https://rstudio.cloud/project/1171531.
+
+*R* or the basic reproduction number estimates the number of susceptible person who can be infected by an already infected person. It is a function of numerous biological, sociobehavioral, and environmental factors. *R* remains a valuable epidemiological concept that helps in decision making during an outbreak. 
+
+Three possibilities exist for the potential transmission or decline of a disease, depending on its R0 value:
+
+> If R0 is less than 1, each existing infection causes less than one new infection. In this case, the disease will decline and eventually die out.\
+> If R0 equals 1, each existing infection causes one new infection. The disease will stay alive and stable, but there won’t be an outbreak or an epidemic.\
+> If R0 is more than 1, each existing infection causes more than one new infection. The disease will be transmitted between people, and there may be an outbreak or epidemic.
+
+Though, there are many sources that report crude numbers, none are currently reporting the reproduction numbers. Therefore, in this blog not only have I computed the weekly-varying reproduction number (R~t~) but also have given detail methodology and algorithms to replicate the same.
+
+### The current weekly reproduction number
+
+The mean weekly reproduction number (R~t~) in India is currently estimated at `r rt_tab[nrow(rt_tab),3]` (SD: `r rt_tab[nrow(rt_tab),4]`). Which means, currently, 100 infected persons will infect another `r round(rt_tab[nrow(rt_tab),3]*100, 0)` susceptible persons during their infection stage. The highest reproduction rate was seen on `r rt_tab[rt_tab$Mean == max(rt_tab$Mean),12]`: `r max(rt_tab$Mean)` (`r rt_tab[rt_tab$Mean == max(rt_tab$Mean),4]`)..
+
+```{r, echo=F, message=FALSE }
+p1 <- ggplot(rt_tab, aes(x=date, y=Mean)) +
+  geom_ribbon(aes(ymin=Mean - Std, ymax=Mean + Std), fill = "grey70")+  
+  geom_line(aes(y=Mean))+
+  geom_segment(aes(xend=max(date), yend = Mean), linetype=2, colour='blue')+
+  geom_point(size = 3) + 
+  geom_text(aes(x = max(date)+.1, label = sprintf("%.2f", Mean)), hjust=0)+
+  transition_reveal(date) + 
+  view_follow(fixed_y = TRUE)+
+  coord_cartesian(clip = 'off') +
+  labs( y = 'Weekly-varying reproduction number', x = "Mid-week date") +
+  ggtitle('NCov19 weekly-varying reproduction number in India (2nd March - 19th April)', subtitle = "Date : {frame_along}")+
+  enter_drift(x_mod = -1) + 
+  exit_drift(x_mod = 1) +
+  theme_bw() +
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"),
+        plot.margin = margin(5.5, 40, 5.5, 5.5))
+
+p2 <- ggplot(c19is  %>% 
+  group_by(typeoftransmission) %>% 
+  count(dateannounced), 
+  aes(x=dateannounced, y=n, group=typeoftransmission)) +
+  geom_line(aes(color = typeoftransmission)) +
+  labs(color = "Type of transmission")+
+  geom_segment(aes(xend=max(dateannounced), yend = n), linetype=2, colour='blue')+
+  geom_point(size = 3) + 
+  geom_text(aes(x = max(dateannounced)+.1, label = sprintf("%5.0f", n)), hjust=0)+
+  transition_reveal(dateannounced) + 
+  view_follow(fixed_y = TRUE)+
+  coord_cartesian(clip = 'off') +
+  labs( y = 'Number of reported cases', x = "Timeline") +
+  ggtitle('NCov19 incidents in India (2nd March - 20th April)', subtitle = "Date : {frame_along}")+
+  enter_drift(x_mod = -1) + 
+  exit_drift(x_mod = 1) +
+  theme_bw() +
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"),
+        plot.margin = margin(5.5, 40, 5.5, 5.5))+
+  theme(legend.position = "bottom")+
+  annotate("text", x = as.Date("2020-03-03", "%Y-%m-%d"), y =100 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-03", "%Y-%m-%d"), y = 400, label = "India\n suspended\n all visas", size = 2.5)+
+  annotate("text", x = as.Date("2020-03-12", "%Y-%m-%d"), y =180 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-12", "%Y-%m-%d"), y = 400, label = "1st Death\n in India", size = 2.5)+
+  annotate("text", x = as.Date("2020-03-16", "%Y-%m-%d"), y =250 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-16", "%Y-%m-%d"), y = 600, label = "1st imported case\n in Odisha", size = 2.5)+
+  annotate("text", x = as.Date("2020-03-25", "%Y-%m-%d"), y =380 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-25", "%Y-%m-%d"), y = 750, label = "Nation-wide\n lock down initiated\n by the PM", size = 2.5)+
+  annotate("text", x = as.Date("2020-03-29", "%Y-%m-%d"), y =600 , label = sprintf('\u261F'), size = 10)+annotate("text", x = as.Date("2020-03-29", "%Y-%m-%d"), y = 1000, label = "Nizamuddin \nMarkaz\n evacuation", size = 2)
+  
+
+animate(p2, fps = 5, height = 260, width = 644)
+animate(p1, fps = 5, height = 260, width = 644)
+
+```
+
+It can be seen on the plot how high R~t~ if followed by increase in incidence and low R~t~ with decreased incident of Corona infections in India. The model also found a decreasing trend in the reproduction number in the last seven days.
+```{r, echo=F}
+result_tab[ ,c(1,2,3,5,6)] %>%
+  arrange(desc(dateannounced)) %>%
+  gt() %>%
+  tab_header(title = "Covid19 incidence and dynamic reproduction number in India") %>%  fmt_date(
+    columns = vars(dateannounced),
+    date_style = 3
+  ) %>%
+  fmt_number(
+    columns = vars(Std),
+    suffixing = TRUE
+  ) %>%
+  cols_label(
+    dateannounced = html("Date"),
+    imported = html("Imported cases"),
+    local = html("Local incidents"),
+    Mean = html("Time varying R~t~"),
+    Std =html("Standard deviation")
+  ) %>%
+  tab_spanner(
+    label = "Reported incidents",
+    columns = vars(local, imported)
+  ) %>%
+  tab_spanner(
+    label = "Reproduction number",
+    columns = vars(Mean, Std)
+  ) %>%
+  tab_footnote(
+    footnote = md("The Reproduction number is measured for every seven days, therefore, generates no values for first 3 and last 4 days."),
+    locations = cells_body(
+      columns = vars(dateannounced),
+      rows = c(1,2,3,47,48,49,50)))
+```
+
+### The below section deals with the details related to the applied methodology and R coding to reproduce the results. 
