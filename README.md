@@ -16,7 +16,7 @@ National level: The is the national level time series data
 
 covid19_code/
 >Data wrangling: Codes to reproduce the files\
-Analysis: All files related to analysis of the data (Commited)
+Analysis: All files related to analysis of the data.
  
 # Frequently asked questions
 Are you official?
