@@ -13,11 +13,15 @@ library(dplyr)
 library(tidyr)
 
 #####Read data from json file####
-ncov19india = fromJSON("https://api.covid19india.org/raw_data.json") %>% as.data.frame
-names(ncov19india) <- gsub("raw_data.", "", names(ncov19india))
+ncov19india_1 = read.csv("https://api.covid19india.org/csv/latest/raw_data1.csv", na.strings = "")
+ncov19india_2 = read.csv("https://api.covid19india.org/csv/latest/raw_data2.csv", na.strings = "")
+ncov19india_n = read.csv("https://api.covid19india.org/csv/latest/raw_data3.csv", na.strings = "")
+colnames(ncov19india_n)[1]<-"Patient.Number"
+
+ncov19india<-rbind(ncov19india_1[ ,c(1,2,3,5,6,7,8,9,10,11,14,15,16)], ncov19india_2[ ,c(1,2,3,5,6,7,8,9,10,11,14,15,16)], ncov19india_n[ ,c(1,2,3,4,5,6,7,8,9,11,17,18,19)])
+ncov19india_raw<-ncov19india[!is.na(ncov19india$Date.Announced),]
 
 #####Creation of raw data set - Individual####
-ncov19india_raw<-ncov19india[ncov19india$dateannounced != "",c(13,17,11,8,7,6,5,3,20,1,10,4,19)]
 write.xlsx(ncov19india_raw, file = "./covid19_data/excel/individual/ncov19individual_raw.xlsx")
 write.csv(ncov19india_raw, file = "./covid19_data/csv/individual/ncov19individual_raw.csv", na = "")
 
