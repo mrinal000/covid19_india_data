@@ -21,7 +21,6 @@ colnames(ncov19india_n)[1]<-"Patient.Number"
 ncov19india<-rbind(ncov19india_1[ ,c(1,2,3,5,6,7,8,9,10,11,14,15,16)], ncov19india_2[ ,c(1,2,3,5,6,7,8,9,10,11,14,15,16)], ncov19india_n[ ,c(1,2,3,4,5,6,7,8,9,11,17,18,19)])
 ncov19india_raw<-ncov19india[!is.na(ncov19india$Date.Announced),]
 names(ncov19india_raw)<-c("patientnumber",	"statepatientnumber",	"dateannounced",	"agebracket",	"gender",	"detectedcity",	"detecteddistrict",	"detectedstate",	"statecode",	"currentstatus",	"nationality",	"typeoftransmission",	"statuschangedate")
-View(ncov19india_raw)
 #####Creation of raw data set - Individual####
 write.xlsx(ncov19india_raw, file = "./covid19_data/excel/individual/ncov19individual_raw.xlsx")
 write.csv(ncov19india_raw, file = "./covid19_data/csv/individual/ncov19individual_raw.csv", na = "")
@@ -71,5 +70,4 @@ ncov19india_timeserise<- ncov19india_clean %>% group_by(dateannounced) %>% tally
 colnames(ncov19india_timeserise)<-c("dateannounced", "numberofcases")
 write.xlsx(ncov19india_timeserise, file = "./covid19_data/excel/national_timeseries/ncov19india_timeserise.xlsx")
 write.csv(ncov19india_timeserise, file = "./covid19_data/csv/national_timeseries/ncov19india_timeserise.csv", na = "")
-unlink("raw_data.json")
 dim(ncov19india_clean)
