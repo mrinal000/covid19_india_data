@@ -1,6 +1,6 @@
 # 2019 Novel Corona virus COVID-19 (2019-nCoV) National Data Repository for India
 
-I hope the data provided here until now has helped you in some way. Due to the rapidly increasing number, the individual data is not available anymore and as aggregate data is now available at various sources, the dataset in this repo will not be updated further. You can get the aggregate data from 
+I hope the data provided here until now has helped you in some way. Due to the rapidly increasing number, the individual data is not available anymore and as aggregate data is now available at various sources, the datasets in this repo will not be updated further (Data will be archived until 26th April). You can get the aggregate data from 
 
 > CSV: https://api.covid19india.org/csv/
 >JSON: https://api.covid19india.org/
