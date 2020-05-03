@@ -37,8 +37,8 @@ Analysis: All files related to analysis of the data.~~
 ~~Then, what are you doing?~~
 ~~>Simple! Just making the background data more accessible to public, data enthusiasts, analysts and researchers etc.~~
 
-~~Is it realtime?
->No. Currently, I am updating the data atleast thrice every day until I completly automate it.~~
+~~Is it realtime?~~
+~~>No. Currently, I am updating the data atleast thrice every day until I completly automate it.~~
 
 # Resources
 >https://www.mohfw.gov.in
