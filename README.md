@@ -10,11 +10,11 @@ Any further anylysis on covid will be updated in the analysis folder.
 Stay safe!
 Stay healthy!
 
-~~This, 2019 Novel Corona virus data repository, is initiated to provide everyone with access to structured individual, state and national level data of corona virus pandemic. This data repository is created with a vision to provide tidy datasets to everybody who wants access to the corona virus data to understand, analyse and innovate solutions. I hope it will fulfill its' purpose. ~~
+~~This, 2019 Novel Corona virus data repository, is initiated to provide everyone with access to structured individual, state and national level data of corona virus pandemic. This data repository is created with a vision to provide tidy datasets to everybody who wants access to the corona virus data to understand, analyse and innovate solutions. I hope it will fulfill its' purpose.~~
 
-~~# Folder structure
-Data/Format/
->Excel: excel files for those who would like to work on the spreadsheet\
+~~# Folder structure~~
+~~Data/Format/~~
+~~>Excel: excel files for those who would like to work on the spreadsheet\
 CSV: CSV files for those who would be more comfortable with textual file~~
 
 ~~Format/Level of observation/~~
