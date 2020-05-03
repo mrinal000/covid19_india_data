@@ -23,19 +23,19 @@ CSV: CSV files for those who would be more comfortable with textual file~~
 State level: The data is of state level and can be found in both long and wide format\
 National level: The is the national level time series data~~
 
-~~covid19_code/
->Data wrangling: Codes to reproduce the files\
+~~covid19_code/~~
+~~>Data wrangling: Codes to reproduce the files\
 Analysis: All files related to analysis of the data.~~
  
-~~# Frequently asked questions
-Are you official?
->No!~~
+~~# Frequently asked questions~~
+~~Are you official?~~
+~~>No!~~
 
-~~Do you collect the data?
->No! It is sourced from [this](https://www.covid19india.org/faq) upstream repository maintained by an amazing group of dedicated volunteers who are curating and verifying the data coming from various state bulletins and official handles. ~~
+~~Do you collect the data?~~
+~~>No! It is sourced from [this](https://www.covid19india.org/faq) upstream repository maintained by an amazing group of dedicated volunteers who are curating and verifying the data coming from various state bulletins and official handles.~~
 
-~~Then, what are you doing?
->Simple! Just making the background data more accessible to public, data enthusiasts, analysts and researchers etc.~~
+~~Then, what are you doing?~~
+~~>Simple! Just making the background data more accessible to public, data enthusiasts, analysts and researchers etc.~~
 
 ~~Is it realtime?
 >No. Currently, I am updating the data atleast thrice every day until I completly automate it.~~
